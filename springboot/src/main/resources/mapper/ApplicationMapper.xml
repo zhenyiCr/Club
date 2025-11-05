@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.ApplicationMapper">
+
+
+    <select id="selectAll" resultType="com.example.entity.Application">
+        select * from `application`
+        <where>
+            <if test="studentId != null and studentId !='' ">student_id like '%${studentId}%'</if>
+            <if test="clubId != null and clubId !='' ">and club_id like '%${clubId}%'</if>
+        </where>
+        order by id desc
+    </select>
+
+    <insert id="insert">
+        insert into `application`(student_id,club_id,status,reason,approver_id,create_time)
+        values(#{studentId},#{clubId},#{status},#{reason},#{approverId},#{createTime})
+    </insert>
+
+    <update id="update">
+        update `application` set student_id=#{studentId},club_id=#{clubId},status=#{status},reason=#{reason},approver_id=#{approverId},approve_time=#{approveTime},remark=#{remark} where
+        id=#{id}
+    </update>
+
+</mapper>

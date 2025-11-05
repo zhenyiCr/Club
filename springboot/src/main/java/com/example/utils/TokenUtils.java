@@ -7,7 +7,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.example.entity.Account;
 import com.example.exception.CustomerException;
 import com.example.service.AdminService;
-import com.example.service.UserService;
+import com.example.service.StudentService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,16 +23,18 @@ public class TokenUtils {
     @Resource
     AdminService adminService;
     @Resource
-    UserService userService;
+    StudentService studentService;
+
+
 
     static AdminService staticAdminService;
-    static UserService staticUserService;
+    static StudentService staticStudentService;
 
     // springboot工程启动后会加载这段代码
     @PostConstruct
     public void init() {
         staticAdminService = adminService;
-        staticUserService = userService;
+        staticStudentService = studentService;
     }
 
     // 生成token
@@ -59,7 +61,7 @@ public class TokenUtils {
         if ("ADMIN".equals(role)) {
             return staticAdminService.selectById(id);
         } else if ("USER".equals(role)) {
-            return staticUserService.selectById(id);
+            return staticStudentService.selectById(id);
         } else {
             throw new CustomerException("404", "出现错误");
         }

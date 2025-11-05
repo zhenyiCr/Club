@@ -3,7 +3,7 @@ package com.example.entity;
 import lombok.Data;
 
 @Data
-public class application {
+public class Application {
         private String id;
         private String studentId;
         private String clubId;

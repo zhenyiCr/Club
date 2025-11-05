@@ -1,0 +1,65 @@
+package com.example.controller;
+
+
+import com.example.common.Result;
+import com.example.entity.Application;
+import com.example.service.ApplicationService;
+import com.github.pagehelper.PageInfo;
+import jakarta.annotation.Resource;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+
+@RestController
+@RequestMapping("/application")
+public class ApplicationController {
+
+    @Resource
+    ApplicationService applicationService;
+
+    @GetMapping("/application")
+    public Result application(String title) {
+        String application = applicationService.Application(title);
+        return Result.success(application);
+    }
+
+    @PostMapping("/add")
+    public Result add(@RequestBody Application application) { // @RequestBody 接受前端传来的json数据
+        applicationService.add(application);
+        return Result.success();
+    }
+    @DeleteMapping("/delete/{id}")
+    public Result delete(@PathVariable String id) { // @PathVariable 接受路径参数
+        applicationService.deleteById(id);
+        return Result.success();
+    }
+    @DeleteMapping("/deleteBatch")
+    public Result deleteBatch(@RequestBody List<Application> list) {
+        applicationService.deleteBatch(list);
+        return Result.success();
+    }
+    @PutMapping("/update")
+    public Result update(@RequestBody Application application) {
+        applicationService.update(application);
+        return Result.success();
+    }
+
+    @GetMapping("/selectAll")
+    public Result selectAll(Application application) {
+        List<Application> applicationList = applicationService.selectAll(application);
+        return Result.success(applicationList);
+    }
+
+    // 分页查询
+    // pageNum 当前页数
+    // pageSize 每页显示的条数
+    @GetMapping("/selectPage")
+    public Result selectPage(@RequestParam(defaultValue = "1") Integer pageNum,
+                            @RequestParam(defaultValue = "10") Integer pageSize,
+                            Application application) {
+        PageInfo<Application> pageInfo = applicationService.selectPage(pageNum,pageSize,application);
+        return Result.success(pageInfo);
+    }
+
+}

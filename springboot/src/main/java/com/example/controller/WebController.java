@@ -3,10 +3,10 @@ package com.example.controller;
 import com.example.common.Result;
 import com.example.entity.Account;
 import com.example.entity.ChangePasswordDTO;
-import com.example.entity.User;
+import com.example.entity.Student;
 import com.example.exception.CustomerException;
 import com.example.service.AdminService;
-import com.example.service.UserService;
+import com.example.service.StudentService;
 import com.example.utils.TokenUtils;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,7 @@ public class WebController {
     @Resource
     AdminService adminService;
     @Resource
-    UserService userService;
+    StudentService studentService;
     @GetMapping("/E")
     public Result hello() {
         return Result.success("hello world");
@@ -31,16 +31,16 @@ public class WebController {
         Account dbAccount = null;
         if (account.getRole().equals("ADMIN")) {
             dbAccount = adminService.login(account);
-        } else if (account.getRole().equals("USER")) {
-            dbAccount = userService.login(account);
+        } else if (account.getRole().equals("STUDENT")) {
+            dbAccount = studentService.login(account);
         } else {
             throw new CustomerException("用户角色错误");
         }
         return Result.success(dbAccount);
     }
     @PostMapping("/register")
-    public Result register(@RequestBody User user) {
-        userService.register(user);
+    public Result register(@RequestBody Student student) {
+        studentService.register(student);
         return Result.success();
     }
 
@@ -55,8 +55,8 @@ public class WebController {
         Account dbAccount = null;
         if (currentAccount.getRole().equals("ADMIN")) {
             dbAccount = adminService.updatePassword(changePasswordDTO, currentAccount);
-        } else if (currentAccount.getRole().equals("USER")) {
-            dbAccount = userService.updatePassword(changePasswordDTO, currentAccount);
+        } else if (currentAccount.getRole().equals("STUDENT")) {
+            dbAccount = studentService.updatePassword(changePasswordDTO, currentAccount);
         } else {
             throw new CustomerException("用户角色错误");
         }
