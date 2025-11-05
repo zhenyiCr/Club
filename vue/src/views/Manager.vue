@@ -59,7 +59,12 @@
                         </el-icon>
                         <span>首页</span>
                     </el-menu-item>
-
+                    <el-menu-item index="/manager/Club">
+                        <el-icon>
+                            <House/>
+                        </el-icon>
+                        <span>社团信息</span>
+                    </el-menu-item>
                     <el-sub-menu index="system">
                         <template #title>
                             <el-icon>
@@ -68,7 +73,7 @@
                             <span>系统设置</span>
                         </template>
                         <el-menu-item index="/manager/admin" v-if="data.user?.role === 'ADMIN' ">管理员信息</el-menu-item>
-                        <el-menu-item index="/manager/user">普通用户信息</el-menu-item>
+                        <el-menu-item index="/manager/student">学生信息</el-menu-item>
                     </el-sub-menu>
 
                     <el-menu-item index="/manager/notice">

@@ -32,18 +32,19 @@
                 </el-upload>
             </el-form-item>
 
-            <el-form-item prop="username" label="账号">
-                <el-input v-model="data.user.username" autocomplete="off"/>
-            </el-form-item>
             <el-form-item prop="name" label="名称">
                 <el-input v-model="data.user.name" autocomplete="off"/>
             </el-form-item>
-            <el-form-item prop="phone" label="电话">
-                <el-input v-model="data.user.phone" autocomplete="off"/>
+            <el-form-item prop="major" label="专业">
+                <el-input v-model="data.user.major" autocomplete="off"/>
             </el-form-item>
-            <el-form-item prop="email" label="邮箱">
-                <el-input v-model="data.user.email" autocomplete="off"/>
+            <el-form-item prop="grade" label="年级">
+                <el-input v-model="data.user.grade" autocomplete="off"/>
             </el-form-item>
+            <el-form-item prop="college" label="学院">
+                <el-input v-model="data.user.college" autocomplete="off"/>
+            </el-form-item>
+
         </el-form>
         <div style="text-align: center">
             <el-button type="primary" style="padding: 18px 35px" @click="update">保存</el-button>
@@ -99,8 +100,8 @@ const update = () => {
         if (valid) { // 表单验证成功
             if (data.user.role =="ADMIN") {
                 url = '/admin/update'
-            } else if (data.user.role =="USER") {
-                url = '/user/update'
+            } else if (data.user.role =="STUDENT") {
+                url = '/student/update'
             } else {
                 ElMessage.error("出现错误 请查看数据库")
             }

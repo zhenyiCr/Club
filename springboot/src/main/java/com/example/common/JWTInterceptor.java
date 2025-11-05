@@ -7,7 +7,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.example.entity.Account;
 import com.example.exception.CustomerException;
 import com.example.service.AdminService;
-import com.example.service.UserService;
+import com.example.service.StudentService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +20,7 @@ public class JWTInterceptor implements HandlerInterceptor {
     @Resource
     AdminService adminService;
     @Resource
-    UserService userService;
+    StudentService studentService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -46,7 +46,7 @@ public class JWTInterceptor implements HandlerInterceptor {
             if ("ADMIN".equals(role)) {
                 account = adminService.selectById(id);
             } else if ("USER".equals(role)) {
-                account = userService.selectById(id);
+                account = studentService.selectById(id);
             } else {
                 throw new CustomerException("404", "出现错误");
             }

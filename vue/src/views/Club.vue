@@ -37,23 +37,29 @@
             <el-table :data="data.tableData" style="width: 100%" @selection-change="handleSelectionChange"
                       :header-cell-style="{fontWeight:'bold',background:'#f5f5f5'}">
                 <el-table-column type="selection" width="55"/>
-                <el-table-column label="头像" width="120px">
+                <el-table-column label="图片" width="120px" size="large">
                     <template #default="scope">
                         <el-image
-                                v-if="scope.row.avatar"
-                                :src="scope.row.avatar"
-                                :preview-src-list="[scope.row.avatar]"
-                                fit="cover"
-                                style="width: 40px; height: 40px; border-radius: 50%; display: block"
+                            v-if="scope.row.avatar"
+                            :src="scope.row.avatar"
+                            :preview-src-list="[scope.row.avatar]"
+                            :preview-teleported="true"
+                            fit="cover"
+                            style="width: 40px; height: 40px; border-radius: 25%; display: block"
                         />
                         <!-- 没有头像时显示默认图标或图片 -->
-                        <el-avatar v-else icon="User" style="width: 40px; height: 40px;"/>
+                        <el-avatar v-else icon="User" style="width: 40px; height: 40px; border-radius: 25%"/>
                     </template>
                 </el-table-column>
-                <el-table-column prop="username" label="账户"/>
                 <el-table-column prop="name" label="姓名"/>
-                <el-table-column label="操作" width="150">
+                <el-table-column prop="description" label="内容">
+                    <template v-slot="scope">
+                        <el-button type="primary" size="mini" @click="viewContent(scope.row.description)">查看</el-button>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="200">
                     <template #default="scope">
+                        <el-button @click="handleApplication(scope.row)" type="primary" icon="edit"></el-button>
                         <el-button @click="headleEdit(scope.row)" type="primary" icon="edit"></el-button>
                         <el-button @click="del(scope.row.id)" type="danger" icon="delete"></el-button>
                     </template>
@@ -72,20 +78,11 @@
                     @size-change="getData"
             />
         </div>
-        <el-dialog title="管理员信息" v-model="data.formVisible" width="500" destroy-on-close>
+        <el-dialog title="社团信息" v-model="data.formVisible" width="60%" destroy-on-close>
             <el-form ref="formRef" :model="data.form" :rules="data.rules" label-width="80px"
                      style="padding:20px 30px 20px 0">
-                <el-form-item prop="username" label="账号">
-                    <el-input v-model="data.form.username" autocomplete="off"/>
-                </el-form-item>
                 <el-form-item prop="name" label="名称">
                     <el-input v-model="data.form.name" autocomplete="off"/>
-                </el-form-item>
-                <el-form-item prop="phone" label="电话">
-                    <el-input v-model="data.form.phone" autocomplete="off"/>
-                </el-form-item>
-                <el-form-item prop="email" label="邮箱">
-                    <el-input v-model="data.form.email" autocomplete="off"/>
                 </el-form-item>
                 <el-form-item prop="avatar" label="头像">
                     <el-upload action="http://127.0.0.1:8080/file/upload"
@@ -96,6 +93,23 @@
                         <el-button>上传头像</el-button>
                     </el-upload>
                 </el-form-item>
+                <el-form-item prop="content" label="内容">
+                    <div style="border: 1px solid #ccc; width: 100%">
+                        <Toolbar
+                            style="border-bottom: 1px solid #ccc"
+                            :editor="editorRef"
+                            :mode="mode"
+                        />
+                        <Editor
+                            style="height: 500px; overflow-y: hidden"
+                            v-model="data.form.description"
+                            :mode="mode"
+                            :defaultConfig="editorConfig"
+                            @onCreated="handleCreated"
+                        />
+
+                    </div>
+                </el-form-item>
             </el-form>
             <template #footer>
                 <div>
@@ -104,47 +118,98 @@
                 </div>
             </template>
         </el-dialog>
+
+        <!-- 查看详情弹窗 -->
+        <el-dialog title="社团信息" v-model="data.viewVisible" width="60%" destroy-on-close>
+            <div class="wang-table-view" v-html="data.form.description"></div>
+        </el-dialog>
+
+        <el-dialog title="申请信息" v-model="data.applicationVisible" width="40%" destroy-on-close>
+            <el-form ref="formRef" :model="data.applicationForm" :rules="data.rules" label-width="80px"
+                     style="padding:20px 30px 20px 0">
+                <el-form-item prop="reason" label="申请原因">
+                    <el-input type="textarea" rows="4" v-model="data.applicationForm.reason" autocomplete="off"/>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <div>
+                    <el-button @click="data.applicationVisible = false">取 消</el-button>
+                    <el-button type="primary" @click="submitApplication">提 交</el-button>
+                </div>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
 <script setup>
-import {reactive, ref} from "vue"
+import {onBeforeUnmount, reactive, ref, shallowRef} from "vue";
 import {Search} from "@element-plus/icons-vue";
 import request from "@/utils/request.js";
 import {ElMessage, ElMessageBox} from "element-plus";
+import {Editor, Toolbar} from "@wangeditor/editor-for-vue";
+import '@wangeditor/editor/dist/css/style.css' // 引入css
 
 
 const data = reactive({
-        user: JSON.parse(localStorage.getItem('user') || '{}'),
-        username: null,
-        name: null,
-        pageNum: 1,
-        pageSize: 10,
-        total: 0,
-        tableData: [],
-        formVisible: false,
-        form: {},
-        rules: {
-            username: [
+    user: JSON.parse(localStorage.getItem('user') || '{}'),
+    username: null,
+    name: null,
+    pageNum: 1,
+    pageSize: 10,
+    total: 0,
+    tableData: [],
+    formVisible: false,
+    form: {},
+    viewVisible: false,
+    applicationVisible: false,
+    applicationForm:{},
+    rules: {
+        name: [
+            {required: true, message: '请输入名称', trigger: 'blur'},
+        ],
+        description: [
                 {required: true, message: '请输入账号', trigger: 'blur'},
-            ],
-            name: [
-                {required: true, message: '请输入名称', trigger: 'blur'},
-            ],
-            phone: []
-            , email: [
-                {required: true, message: '请输入邮箱', trigger: 'blur'},
-            ]
-        },
-        rows: [],
-        ids: [],
-    }
-)
+        ]
+    },
+    rows: [],
+    ids: [],
+})
 
 const formRef = ref()
 
+// wangEditor5 初始化开始
+const editorRef = shallowRef() //编辑器实例 必须用shallowRef
+const mode = 'default'
+const editorConfig = {MENU_CONF: {}}
+// 图片上传配置
+editorConfig.MENU_CONF['uploadImage'] = {
+    headers: {
+        token: data.user.token,
+    },
+    server: 'http://127.0.0.1:8080/file/wang/upload', // 服务端上传地址
+    fieldName: 'file', // 服务端接收图片的参数名
+    // 新增：图片插入后的默认样式（限制最大宽度）
+    image: {
+        // 所有插入的图片，最大宽度为容器的 100%
+        style: {
+            maxWidth: '50%',
+            height: 'auto' // 高度自动适配，保持比例
+        }
+    }
+}
+// 组件销毁时，及时销毁编辑器 ，防止内存泄漏
+onBeforeUnmount(() => {
+    const editor = editorRef.value
+    if (editor == null) return
+    editor.destroy() // 销毁编辑器
+})
+// 记录 editor 实例，用于后续操作
+const handleCreated = (editor) => {
+    editorRef.value = editor // 记录 editor 实例，用于后续操作
+}
+// wangEditor5 初始化结束
 const getData = () => {
-    request.get('/admin/selectPage', {
+    request.get('/club/selectPage', {
             params: {
                 pageNum: data.pageNum,
                 pageSize: data.pageSize,
@@ -175,7 +240,7 @@ const add = () => {
     // formRef 表单的验证
     formRef.value.validate((valid) => {
         if (valid) { // 表单验证成功
-            request.post('/admin/add', data.form).then(res => {
+            request.post('/club/add', data.form).then(res => {
                 if (res.code === '200') {
                     ElMessage.success("新增成功")
                     data.formVisible = false
@@ -195,7 +260,7 @@ const edit = () => {
     // formRef 表单的验证
     formRef.value.validate((valid) => {
         if (valid) { // 表单验证成功
-            request.put('/admin/update', data.form).then(res => {
+            request.put('/club/update', data.form).then(res => {
                 if (res.code === '200') {
                     ElMessage.success("修改成功")
                     data.formVisible = false
@@ -213,7 +278,7 @@ const save = () => {
 
 const del = (id) => {
     ElMessageBox.confirm(' 你确定删除信息吗', 'Warning', {type: 'warning'}).then(() => {
-        request.delete('/admin/delete/' + id).then(res => {
+        request.delete('/club/delete/' + id).then(res => {
             if (res.code === '200') {
                 ElMessage.success("删除成功")
                 getData()
@@ -236,7 +301,7 @@ const deleteBatch = () => {
         return
     }
     ElMessageBox.confirm(' 你确定删除信息吗', 'Warning', {type: 'warning'}).then(() => {
-        request.delete('/admin/deleteBatch', {data: data.rows}).then(res => {
+        request.delete('/club/deleteBatch', {data: data.rows}).then(res => {
             if (res.code === '200') {
                 ElMessage.success("删除成功")
                 getData()
@@ -249,7 +314,7 @@ const deleteBatch = () => {
 
 const exportDate = () => {
     let idsStr = data.ids.join(",") // 把数组转换成 字符串  [1,2,3] -> "1,2,3"
-    let url = `http://localhost:8080/admin/export?username=${data.username === null ? '' : data.username}`
+    let url = `http://localhost:8080//export?username=${data.username === null ? '' : data.username}`
         + `&name=${data.name === null ? '' : data.name}`
         + `&ids=${idsStr}`
         + `&token=${data.user.token}`
@@ -267,4 +332,53 @@ const handleImportSuccess = (res) => {
 const handleFileSuccess = (res) => {
     data.form.avatar = res.data
 }
+
+const viewContent = (description) => {
+    data.viewVisible = true
+    data.form.description = description
+}
+const handleApplication = (row) => {
+    data.applicationVisible = true
+    data.applicationForm.studentId = data.user.id
+    data.applicationForm.clubId = row.id
+}
+
+const submitApplication = () => {
+    // formRef 表单的验证
+    formRef.value.validate((valid) => {
+        if (valid) { // 表单验证成功
+            request.post('application/add', data.applicationForm).then(res => {
+                if (res.code === '200') {
+                    ElMessage.success("申请成功")
+                    data.applicationVisible = false
+                } else {
+                    ElMessage.error(res.msg)
+                }
+            })
+        }
+    })
+}
 </script>
+
+<style scoped>
+:deep(.wang-table-view table) {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 10px 0;
+}
+:deep(.wang-table-view table tr td),
+:deep(.wang-table-view table tr th) {
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+}
+:deep(.wang-table-view table th) {
+    background-color: #f5f5f5;
+    font-weight: bold;
+}
+:deep(.wang-table-view img) {
+    max-width: 100%;
+    height: auto; /* 保持图片比例 */
+    display: block; /* 可选：让图片独占一行，避免和文字拥挤 */
+    margin: 0 auto; /* 可选：让图片居中显示 */
+}
+</style>

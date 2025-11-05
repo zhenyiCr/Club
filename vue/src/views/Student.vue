@@ -58,8 +58,9 @@
                 <!--                </el-table-column>-->
                 <el-table-column prop="username" label="账户"/>
                 <el-table-column prop="name" label="姓名"/>
-                <el-table-column prop="phone" label="电话号"/>
-                <el-table-column prop="email" label="邮箱"/>
+                <el-table-column prop="major" label="专业"/>
+                <el-table-column prop="grade" label="年级"/>
+                <el-table-column prop="college" label="学院"/>
                 <el-table-column label="操作" width="150">
                     <template #default="scope">
                         <el-button @click="headleEdit(scope.row)" type="primary" icon="edit"></el-button>
@@ -80,7 +81,7 @@
                     @size-change="getData"
             />
         </div>
-        <el-dialog title="用户信息" v-model="data.formVisible" width="500" destroy-on-close>
+        <el-dialog title="学生信息" v-model="data.formVisible" width="500" destroy-on-close>
             <el-form ref="formRef" :model="data.form" :rules="data.rules" label-width="80px"
                      style="padding:20px 30px 20px 0">
                 <el-form-item prop="username" label="账号">
@@ -89,11 +90,14 @@
                 <el-form-item prop="name" label="名称">
                     <el-input v-model="data.form.name" autocomplete="off"/>
                 </el-form-item>
-                <el-form-item prop="phone" label="电话">
-                    <el-input v-model="data.form.phone" autocomplete="off"/>
+                <el-form-item prop="major" label="专业">
+                    <el-input v-model="data.form.major" autocomplete="off"/>
                 </el-form-item>
-                <el-form-item prop="email" label="邮箱">
-                    <el-input v-model="data.form.email" autocomplete="off"/>
+                <el-form-item prop="grade" label="年级">
+                    <el-input v-model="data.form.grade" autocomplete="off"/>
+                </el-form-item>
+                <el-form-item prop="college" label="学院">
+                    <el-input v-model="data.form.college" autocomplete="off"/>
                 </el-form-item>
                 <el-form-item prop="avatar" label="头像">
                     <el-upload action="http://127.0.0.1:8080/file/upload"
@@ -138,10 +142,6 @@ const data = reactive({
             ],
             name: [
                 {required: true, message: '请输入名称', trigger: 'blur'},
-            ],
-            phone: []
-            , email: [
-                {required: true, message: '请输入邮箱', trigger: 'blur'},
             ]
         },
         rows: [],
@@ -152,7 +152,7 @@ const data = reactive({
 const formRef = ref()
 
 const getData = () => {
-    request.get('/user/selectPage', {
+    request.get('/student/selectPage', {
             params: {
                 pageNum: data.pageNum,
                 pageSize: data.pageSize,
@@ -183,7 +183,7 @@ const add = () => {
     // formRef 表单的验证
     formRef.value.validate((valid) => {
         if (valid) { // 表单验证成功
-            request.post('/user/add', data.form).then(res => {
+            request.post('/student/add', data.form).then(res => {
                 if (res.code === '200') {
                     ElMessage.success("新增成功")
                     data.formVisible = false
@@ -203,7 +203,7 @@ const edit = () => {
     // formRef 表单的验证
     formRef.value.validate((valid) => {
         if (valid) { // 表单验证成功
-            request.put('/user/update', data.form).then(res => {
+            request.put('/student/update', data.form).then(res => {
                 if (res.code === '200') {
                     ElMessage.success("修改成功")
                     data.formVisible = false
@@ -221,7 +221,7 @@ const save = () => {
 
 const del = (id) => {
     ElMessageBox.confirm(' 你确定删除信息吗', 'Warning', {type: 'warning'}).then(() => {
-        request.delete('/user/delete/' + id).then(res => {
+        request.delete('/student/delete/' + id).then(res => {
             if (res.code === '200') {
                 ElMessage.success("删除成功")
                 getData()
@@ -244,7 +244,7 @@ const deleteBatch = () => {
         return
     }
     ElMessageBox.confirm(' 你确定删除信息吗', 'Warning', {type: 'warning'}).then(() => {
-        request.delete('/user/deleteBatch', {data: data.rows}).then(res => {
+        request.delete('/student/deleteBatch', {data: data.rows}).then(res => {
             if (res.code === '200') {
                 ElMessage.success("删除成功")
                 getData()
@@ -257,7 +257,7 @@ const deleteBatch = () => {
 
 const exportDate = () => {
     let idsStr = data.ids.join(",") // 把数组转换成 字符串  [1,2,3] -> "1,2,3"
-    let url = `http://localhost:8080/user/export?username=${data.username === null ? '' : data.username}`
+    let url = `http://localhost:8080/student/export?username=${data.username === null ? '' : data.username}`
         + `&name=${data.name === null ? '' : data.name}`
         + `&ids=${idsStr}`
         + `&token=${data.user.token}`
