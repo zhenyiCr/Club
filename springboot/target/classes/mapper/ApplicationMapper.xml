@@ -6,18 +6,25 @@
 
 
     <select id="selectAll" resultType="com.example.entity.Application">
-        select * from `application`
+        select * from application
         <where>
-            <if test="studentId != null and studentId !='' ">student_id like '%${studentId}%'</if>
-            <if test="clubId != null and clubId !='' ">and club_id like '%${clubId}%'</if>
+            <if test="status != null">and status = #{status}</if>
+            <if test="clubId != null">and club_id = #{clubId}</if>
+            <if test="studentId != null">and student_id = #{studentId}</if>
         </where>
-        order by id desc
+        order by create_time desc
     </select>
 
     <insert id="insert">
         insert into `application`(student_id,club_id,status,reason,approver_id,create_time)
         values(#{studentId},#{clubId},#{status},#{reason},#{approverId},#{createTime})
     </insert>
+
+    <update id="updateStatus">
+        update application
+        set status = #{status}, approver_id = #{approverId}, approve_time = #{approveTime}, remark = #{remark}
+        where id = #{id}
+    </update>
 
     <update id="update">
         update `application` set student_id=#{studentId},club_id=#{clubId},status=#{status},reason=#{reason},approver_id=#{approverId},approve_time=#{approveTime},remark=#{remark} where

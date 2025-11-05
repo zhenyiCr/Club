@@ -62,4 +62,11 @@ public class ApplicationController {
         return Result.success(pageInfo);
     }
 
+    // 审核申请（更新状态）
+    @PutMapping("/approve")
+    public Result approve(@RequestBody Application application) {
+        applicationService.approve(application);
+        return Result.success();
+    }
+
 }

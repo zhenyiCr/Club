@@ -22,4 +22,7 @@ public interface ApplicationMapper {
     @Delete("delete from `application` where id = #{id}")
     void deleteById(String id);
 
+    // 更新申请状态（审核用）
+    void updateStatus(Application application);
+
 }
