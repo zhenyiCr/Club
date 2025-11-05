@@ -13,4 +13,9 @@ public class Application {
         private String createTime;
         private String approveTime;
         private String remark;
+
+        // 非数据库字段，用于前端显示
+        private String studentName;
+        private String clubName;
+        private String approverName;
 }
