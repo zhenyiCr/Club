@@ -94,6 +94,12 @@
                         </el-icon>
                         <span>分类</span>
                     </el-menu-item>
+                    <el-menu-item index="/manager/ApplicationManage">
+                        <el-icon>
+                            <House/>
+                        </el-icon>
+                        <span>申请</span>
+                    </el-menu-item>
                 </el-menu>
             </aside>
             <!--  菜单区域结束    -->
