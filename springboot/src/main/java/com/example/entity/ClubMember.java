@@ -7,7 +7,6 @@ public class ClubMember {
         private String id;
         private String clubId;
         private String studentId;
-        private String role;
+        private String role; // 社团内角色：MEMBER（普通成员）、MANAGER（社团管理员）
         private String joinTime;
-        private String leaveTime;
 }

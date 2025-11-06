@@ -24,5 +24,6 @@ public interface ApplicationMapper {
 
     // 更新申请状态（审核用）
     void updateStatus(Application application);
-
+    @Select("select * from `application` where student_id = #{StudentId} and club_id = #{ClubId}")
+    Application selectByStudentAndClub(String StudentId , String ClubId);
 }

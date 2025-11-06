@@ -50,6 +50,14 @@ public class ClubService {
 
 
     public void update(Club club) {
+        // 校验权限（只有创始人可修改）
+        String currentUserId = TokenUtils.getCurrentUser().getId();
+        Club oldClub = clubMapper.selectById(club.getId());
+        if (!oldClub.getFounderId().equals(currentUserId)) {
+            throw new CustomerException("无权限修改社团信息");
+        }
+
+        // 原有名称校验逻辑
         if (!clubMapper.selectName(club).equals(club.getName())) {
             Club dbClub = clubMapper.selectByName(club.getName());
             if (dbClub != null) {
@@ -57,7 +65,6 @@ public class ClubService {
             }
         }
         clubMapper.update(club);
-
     }
 
     public void deleteById(String id) {
