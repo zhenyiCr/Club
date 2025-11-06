@@ -6,18 +6,19 @@
 
 
     <select id="selectAll" resultType="com.example.entity.Application">
-        select application.*,`club`.name as clubName,`student`.name as userName from `application`
+        select application.*,`club`.name as clubName,`student`.name as studentName from `application`
         left join `club` on application.club_id = `club`.id
-        left join `user` on application.student_id = `user`.id
+        left join `student` on application.student_id = `student`.id
         <where>
-            <if test="status != null">and status = #{status}</if>
+            <if test="status != null and status !=''">and application.status = #{status}</if>
+            <if test="studentId != null and studentId !='' ">and student_id = #{studentId}</if>
         </where>
         order by create_time desc
     </select>
 
     <insert id="insert">
-        insert into `application`(student_id,club_id,status,reason,approver_id,create_time,approve_time)
-        values(#{studentId},#{clubId},#{status},#{reason},#{approverId},#{createTime},#{approveTime})
+        insert into `application`(student_id,club_id,status,reason,approver_id,create_time,approve_time,remark)
+        values(#{studentId},#{clubId},#{status},#{reason},#{approverId},#{createTime},#{approveTime},#{remark})
     </insert>
 
     <update id="updateStatus">
