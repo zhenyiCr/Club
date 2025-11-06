@@ -82,18 +82,6 @@
                         </el-icon>
                         <span>系统公告</span>
                     </el-menu-item>
-                    <el-menu-item index="/manager/introduction">
-                        <el-icon>
-                            <House/>
-                        </el-icon>
-                        <span>文本</span>
-                    </el-menu-item>
-                    <el-menu-item index="/manager/category">
-                        <el-icon>
-                            <House/>
-                        </el-icon>
-                        <span>分类</span>
-                    </el-menu-item>
                     <el-menu-item index="/manager/ApplicationManage">
                         <el-icon>
                             <House/>
