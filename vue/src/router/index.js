@@ -15,6 +15,7 @@ const router = createRouter({
                 {path: 'notice',meta: {name: '系统公告'}, component:() => import('../views/Notice.vue')},
                 {path: 'club',meta: {name: '社团'}, component:() => import('../views/Club.vue')},
                 {path: 'applicationManage',meta: {name: '申请'}, component:() => import('../views/ApplicationManage.vue')},
+                {path: 'clubMemberManage',meta: {name: '社团成员管理'}, component:() => import('../views/ClubMemberManage.vue')},
             ]
         },
         {path: '/login', component: import('../views/Login.vue')},

@@ -1,29 +1,24 @@
+// Club/springboot/src/main/java/com/example/mapper/ClubMemberMapper.java
 package com.example.mapper;
 
-
-import com.example.entity.Club;
 import com.example.entity.ClubMember;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
-
+import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
+@Mapper
 public interface ClubMemberMapper {
-    List<ClubMember> selectAll(ClubMember clubMember);
+    // 根据社团ID查询成员
+    List<ClubMember> selectByClubId(String clubId);
 
+    // 添加社团成员
     void insert(ClubMember clubMember);
 
+    // 移除社团成员
+    void deleteById(String id);
 
-    void update(ClubMember clubMember);
+    // 更新成员角色
+    void updateRole(ClubMember clubMember);
 
-
-    ClubMember selectByClubAndStudent(String ClubId,String StudentId);
-
-    @Delete("delete from club_member where club_id = #{clubId} and student_id = #{studentId}")
-    void delete(String ClubId,String StudentId);
-    @Select("select * from club_member where club_id = #{clubId}")
-    List<ClubMember> selectByClubId(String clubId);
-    @Update("update club_member set role = #{manager} where club_id = #{clubId} and student_id = #{studentId}")
-    void updateRole(String clubId, String studentId, String manager);
+    // 查询所有社团成员
+    List<ClubMember> selectAll(ClubMember clubMember);
 }

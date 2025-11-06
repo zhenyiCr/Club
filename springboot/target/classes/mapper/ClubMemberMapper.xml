@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.ClubMemberMapper">
+
+    <select id="selectByClubId" resultType="com.example.entity.ClubMember">
+        select cm.*, c.name as clubName, s.name as studentName
+        from club_member cm
+        left join club c on cm.club_id = c.id
+        left join student s on cm.student_id = s.id
+        where cm.club_id = #{clubId}
+        order by cm.join_time desc
+    </select>
+
+    <select id="selectAll" resultType="com.example.entity.ClubMember">
+        select cm.*, c.name as clubName, s.name as studentName
+        from club_member cm
+        left join club c on cm.club_id = c.id
+        left join student s on cm.student_id = s.id
+        <where>
+            <if test="clubId != null and clubId != ''">and cm.club_id = #{clubId}</if>
+            <if test="role != null and role != ''">and cm.role = #{role}</if>
+        </where>
+        order by cm.join_time desc
+    </select>
+
+    <insert id="insert">
+        insert into club_member(club_id, student_id, role, join_time)
+        values(#{clubId}, #{studentId}, #{role}, #{joinTime})
+    </insert>
+
+    <delete id="deleteById">
+        delete from club_member where id = #{id}
+    </delete>
+
+    <update id="updateRole">
+        update club_member set role = #{role} where id = #{id}
+    </update>
+
+</mapper>
