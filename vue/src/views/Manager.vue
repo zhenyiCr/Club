@@ -88,6 +88,12 @@
                         </el-icon>
                         <span>申请</span>
                     </el-menu-item>
+                    <el-menu-item index="/manager/clubMemberManage">
+                        <el-icon>
+                            <House/>
+                        </el-icon>
+                        <span>社团成员管理</span>
+                    </el-menu-item>
                 </el-menu>
             </aside>
             <!--  菜单区域结束    -->
