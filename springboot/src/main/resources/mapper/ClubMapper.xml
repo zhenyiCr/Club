@@ -15,7 +15,7 @@
 
     <insert id="insert">
         insert into `club`(name,description,avatar,founder_id,status)
-        values(#{name},#{description},#{avatar},#{founder_id},#{status})
+        values(#{name},#{description},#{avatar},#{founderId},#{status})
     </insert>
 
     <update id="update">

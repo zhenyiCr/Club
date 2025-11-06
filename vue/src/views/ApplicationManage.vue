@@ -33,12 +33,16 @@
                     label-width="80px"
                     class="application-form"
                 >
-                    <el-form-item prop="clubId" label="社团ID">
-                        <el-input
-                            v-model="data.form.clubId"
-                            placeholder="请输入要申请的社团ID"
-                            class="form-input"
-                        />
+                    <el-form-item prop="clubId" label="社团名称">
+                        <el-select v-model="data.form.clubId"
+                                   placeholder="请选择社团">
+                            <el-option
+                                v-for="item in data.clubData"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id"
+                            />
+                        </el-select>
                     </el-form-item>
                     <el-form-item prop="reason" label="申请理由">
                         <el-input
@@ -71,12 +75,26 @@
         <!-- 公共：申请列表 -->
         <div class="list-container">
             <div class="search-bar">
-                <el-input
+                <el-select
                     v-model="data.searchStatus"
-                    placeholder="请输入状态（PENDING-待审核，APPROVED-通过，REJECTED-拒绝）"
+                    placeholder="请选择状态"
                     class="status-input"
                     clearable
-                />
+                    @clear="getData"
+                >
+                    <el-option
+                        label="待审核"
+                        value="PENDING"
+                    />
+                    <el-option
+                        label="已通过"
+                        value="APPROVED"
+                    />
+                    <el-option
+                        label="已拒绝"
+                        value="REJECTED"
+                    />
+                </el-select>
                 <el-button
                     @click="getData"
                     class="search-btn"
@@ -84,6 +102,7 @@
                     <el-icon><Search /></el-icon>
                     查询
                 </el-button>
+                <el-button @click="reset">重置</el-button>
             </div>
 
             <el-table
@@ -93,10 +112,10 @@
                 :header-cell-style="headerCellStyle"
                 :row-class-name="tableRowClassName"
             >
-                <el-table-column prop="id" label="申请ID" width="100"/>
                 <el-table-column prop="studentName" label="学生名字"/>
                 <el-table-column prop="clubName" label="社团名称"/>
                 <el-table-column prop="reason" label="申请理由" min-width="200"/>
+                <el-table-column prop="remark" label="审核理由" min-width="200"/>
                 <el-table-column prop="status" label="状态" width="140">
                     <template #default="scope">
                         <el-tag
@@ -164,20 +183,20 @@ const data = reactive({
     pageSize: 10,
     total: 0,
     searchStatus: '',
+    clubData: [],
     rules: {
         clubId: [{ required: true, message: '请输入社团ID', trigger: 'blur' }],
-        reason: [{ required: true, message: '请输入申请理由', trigger: 'blur' }]
     }
-});
+})
 
-const formRef = ref();
+const formRef = ref()
 
 // 表格样式相关计算属性
 const headerCellStyle = computed(() => ({
     'background-color': '#f5f7fa',
     'font-weight': 'bold',
     'color': '#333'
-}));
+}))
 
 // 格式化状态显示
 const formatStatus = (status) => {
@@ -187,12 +206,12 @@ const formatStatus = (status) => {
         'REJECTED': '已拒绝'
     };
     return statusMap[status] || status;
-};
+}
 
 // 表格行样式
 const tableRowClassName = ({ row, rowIndex }) => {
     return rowIndex % 2 === 0 ? 'even-row' : 'odd-row';
-};
+}
 
 // 获取申请列表
 const getData = () => {
@@ -207,9 +226,13 @@ const getData = () => {
             data.tableData = res.data.list;
             data.total = res.data.total;
         }
-    });
-};
-
+    })
+}
+// 重置查询条件
+const reset = () => {
+    data.searchStatus = '';
+    getData();
+}
 // 提交申请
 const submitApplication = () => {
     formRef.value.validate(valid => {
@@ -223,10 +246,10 @@ const submitApplication = () => {
                 } else {
                     ElMessage.error(res.msg);
                 }
-            });
+            })
         }
-    });
-};
+    })
+}
 
 // 审核申请
 const handleApprove = (row, status) => {
@@ -256,15 +279,25 @@ const handleApprove = (row, status) => {
                     if (memberRes.code !== '200') {
                         ElMessage.warning('加入社团失败：' + memberRes.msg);
                     }
-                });
+                })
             }
             getData();
         }
-    });
-};
+    })
+}
 
 // 初始化加载列表
-getData();
+getData()
+
+const loadClubData = () => {
+    request.get('/club/selectAll').then(res => {
+        if (res.code === '200') {
+            data.clubData = res.data;
+        }
+    })
+}
+loadClubData()
+
 </script>
 
 <style scoped>
