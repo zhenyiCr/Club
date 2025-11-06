@@ -15,7 +15,8 @@ public interface ClubMapper {
 
     @Select("select * from `club` where name = #{name}")
     Club selectByName(String title);
-
+    @Select("select * from `club` where id = #{id}")
+    Club selectById (String id);
     void update(Club club);
 
     @Select("select name from `club` where id = #{id}")

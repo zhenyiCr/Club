@@ -18,11 +18,6 @@ public class ApplicationController {
     @Resource
     ApplicationService applicationService;
 
-    @GetMapping("/application")
-    public Result application(String title) {
-        String application = applicationService.Application(title);
-        return Result.success(application);
-    }
 
     @PostMapping("/add")
     public Result add(@RequestBody Application application) { // @RequestBody 接受前端传来的json数据

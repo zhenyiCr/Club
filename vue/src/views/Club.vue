@@ -84,14 +84,20 @@
                 <el-form-item prop="name" label="名称">
                     <el-input v-model="data.form.name" autocomplete="off"/>
                 </el-form-item>
-                <el-form-item prop="avatar" label="头像">
-                    <el-upload action="http://127.0.0.1:8080/file/upload"
-                               :headers="{token: data.user.token}"
-                               :on-success="handleFileSuccess"
-                               list-type="picture"
+                <el-form-item prop="avatar" label="社团头像">
+                    <el-upload
+                        action="/api/upload/avatar"
+                        :on-success="handleFileSuccess"
+                        :show-file-list="false"
+                        accept="image/*"
                     >
-                        <el-button>上传头像</el-button>
+                        <el-button size="small" type="primary">上传头像</el-button>
                     </el-upload>
+                    <el-image
+                        v-if="data.form.avatar"
+                        :src="data.form.avatar"
+                        style="width: 100px; height: 100px; margin-top: 10px"
+                    />
                 </el-form-item>
                 <el-form-item prop="content" label="内容">
                     <div style="border: 1px solid #ccc; width: 100%">

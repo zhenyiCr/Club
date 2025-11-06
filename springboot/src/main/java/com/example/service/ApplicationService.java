@@ -4,8 +4,11 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.example.entity.Account;
 import com.example.entity.Application;
+import com.example.entity.Club;
+import com.example.entity.ClubMember;
 import com.example.exception.CustomerException;
 import com.example.mapper.ApplicationMapper;
+import com.example.mapper.ClubMapper;
 import com.example.utils.TokenUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -19,18 +22,32 @@ public class ApplicationService {
 
     @Resource
     ApplicationMapper applicationMapper;
-
-    public String Application(String title) {
-        if (title.equals("application"))
-            return title;
-        else throw new CustomerException("标题不存在");
-    }
+    @Resource
+    ClubMapper clubMapper;
 
     public List<Application> selectAll(Application  application) {
         return applicationMapper.selectAll(application);
     }
 
     public void add(Application application) {
+        // 1. 获取当前登录学生ID
+        String studentId = TokenUtils.getCurrentUser().getId();
+        application.setStudentId(studentId);
+
+        // 2. 校验社团是否存在
+        Club club = clubMapper.selectById(application.getClubId());
+        if (club == null) {
+            throw new CustomerException("该社团不存在");
+        }
+
+        // 3. 新增校验：检查该学生是否已申请过该社团（核心逻辑）
+        Application existing = applicationMapper.selectByStudentAndClub(
+                studentId,
+                application.getClubId()
+        );
+        if (existing != null) {
+            throw new CustomerException("你已申请过该社团，无需重复申请");
+        }
         application.setStatus("PENDING");
         application.setCreateTime(DateUtil.now());
         applicationMapper.insert(application);
@@ -41,7 +58,7 @@ public class ApplicationService {
     public PageInfo<Application> selectPage(Integer pageNum, Integer pageSize, Application application) {
         Account currentUser = TokenUtils.getCurrentUser();
         // 学生只能看自己的申请，管理员可以看所有
-        if ("USER".equals(currentUser.getRole())) {
+        if ("STUDENT".equals(currentUser.getRole())) {
             application.setStudentId(currentUser.getId());
         }
         PageHelper.startPage(pageNum, pageSize);

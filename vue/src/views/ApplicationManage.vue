@@ -94,8 +94,8 @@
                 :row-class-name="tableRowClassName"
             >
                 <el-table-column prop="id" label="申请ID" width="100"/>
-                <el-table-column prop="studentId" label="学生ID"/>
-                <el-table-column prop="clubId" label="社团ID"/>
+                <el-table-column prop="studentName" label="学生名字"/>
+                <el-table-column prop="clubName" label="社团名称"/>
                 <el-table-column prop="reason" label="申请理由" min-width="200"/>
                 <el-table-column prop="status" label="状态" width="140">
                     <template #default="scope">
@@ -233,7 +233,7 @@ const handleApprove = (row, status) => {
     let remark = '';
     if (status === 'REJECTED') {
         remark = prompt('请输入拒绝理由：');
-        if (remark === null) return; // 用户取消输入
+        if (remark === null) return;
         if (!remark.trim()) {
             ElMessage.warning('拒绝理由不能为空');
             return;
@@ -247,6 +247,17 @@ const handleApprove = (row, status) => {
     }).then(res => {
         if (res.code === '200') {
             ElMessage.success('操作成功');
+            // 审核通过时，自动添加到社团成员
+            if (status === 'APPROVED') {
+                request.post('/clubMember/add', {
+                    clubId: row.clubId,
+                    studentId: row.studentId
+                }).then(memberRes => {
+                    if (memberRes.code !== '200') {
+                        ElMessage.warning('加入社团失败：' + memberRes.msg);
+                    }
+                });
+            }
             getData();
         }
     });
