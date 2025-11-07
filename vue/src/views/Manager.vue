@@ -72,8 +72,10 @@
                             </el-icon>
                             <span>系统设置</span>
                         </template>
+                        <!-- 管理员信息：仅ADMIN可见 -->
                         <el-menu-item index="/manager/admin" v-if="data.user?.role === 'ADMIN' ">管理员信息</el-menu-item>
-                        <el-menu-item index="/manager/student">学生信息</el-menu-item>
+                        <!-- 学生信息：ADMIN和LEADER可见 -->
+                        <el-menu-item index="/manager/student" v-if="data.user?.role === 'ADMIN' || data.user?.role === 'LEADER'">学生信息</el-menu-item>
                     </el-sub-menu>
 
                     <el-menu-item index="/manager/notice">
