@@ -13,6 +13,7 @@
                     placeholder="请选择社团"
                     class="club-select"
                     @change="handleClubChange"
+                    :disabled="data.clubSelectDisabled"
             >
                 <el-option
                         v-for="club in data.clubList"
@@ -21,7 +22,7 @@
                         :value="club.id"
                 />
             </el-select>
-
+            <!-- 添加成员按钮：仅ADMIN和LEADER可见 -->
             <el-button
                     type="primary"
                     @click="showAddMemberDialog"
@@ -32,7 +33,7 @@
             </el-button>
         </div>
 
-        <!-- 成员列表 -->
+        <!-- 表格操作列：LEADER只能操作自己社团的成员 -->
         <el-table
                 :data="data.tableData"
                 border
@@ -168,6 +169,7 @@ const data = reactive({
 
     // 添加成员相关
     addDialogVisible: false,
+    clubSelectDisabled: false, // 新增：是否禁用社团选择器
     addForm: {
         clubId: '',
         studentId: '',
@@ -190,17 +192,33 @@ const data = reactive({
 const addFormRef = ref();
 const roleFormRef = ref();
 
+// 新增：判断是否有成员操作权限
+const hasOperationPermission = (row) => {
+    if (data.user.role === 'ADMIN') return true;
+    if (data.user.role === 'LEADER') {
+        // LEADER只能操作自己社团的成员
+        return row.clubId === data.selectedClubId;
+    }
+    return false
+}
+
 // 表格头部样式
 const headerCellStyle = computed(() => ({
     'background-color': '#f5f7fa',
     'font-weight': 'bold'
-}));
+}))
 
-// 获取所有社团
+// 获取社团列表时，LEADER默认选中自己的社团
 const getClubs = () => {
     request.get('/club/selectAll').then(res => {
         if (res.code === '200') {
             data.clubList = res.data;
+            // LEADER默认选中自己的社团，且禁用选择器
+            if (data.user.role === 'LEADER' && data.clubList.length > 0) {
+                data.selectedClubId = data.clubList[0].id;
+                data.clubSelectDisabled = true; // 禁用选择器
+                handleClubChange(); // 加载成员列表
+            }
         }
     });
 };

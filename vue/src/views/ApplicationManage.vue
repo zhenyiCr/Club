@@ -134,7 +134,7 @@
                             type="success"
                             size="small"
                             @click="handleApprove(scope.row, 'APPROVED')"
-                            v-if="scope.row.status === 'PENDING'"
+                            v-if="canApprove(scope.row)"
                             class="table-btn approve-btn"
                         >
                             <el-icon><Check /></el-icon>
@@ -144,7 +144,7 @@
                             type="danger"
                             size="small"
                             @click="handleApprove(scope.row, 'REJECTED')"
-                            v-if="scope.row.status === 'PENDING'"
+                            v-if="canApprove(scope.row)"
                             class="table-btn reject-btn"
                         >
                             <el-icon><Close /></el-icon>
@@ -190,6 +190,16 @@ const data = reactive({
 })
 
 const formRef = ref()
+
+// 新增：判断是否有审核权限
+const canApprove = (row) => {
+    if (data.user.role === 'ADMIN') return true;
+    if (data.user.role === 'LEADER') {
+        // LEADER只能审核自己社团的申请
+        return row.clubId === data.user.clubId && row.status === 'PENDING'
+    }
+    return false
+}
 
 // 表格样式相关计算属性
 const headerCellStyle = computed(() => ({
@@ -253,6 +263,10 @@ const submitApplication = () => {
 
 // 审核申请
 const handleApprove = (row, status) => {
+    if (!canApprove(row)) {
+        ElMessage.warning('无权限审核该申请');
+        return;
+    }
     let remark = '';
     if (status === 'REJECTED') {
         remark = prompt('请输入拒绝理由：');
