@@ -3,6 +3,8 @@ package com.example.mapper;
 
 import com.example.entity.ClubMember;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+
 import java.util.List;
 
 @Mapper
@@ -21,4 +23,8 @@ public interface ClubMemberMapper {
 
     // 查询所有社团成员
     List<ClubMember> selectAll(ClubMember clubMember);
+
+    // 根据ID查询社团成员
+    @Select("select * from club_member where id = #{id}")
+    ClubMember selectById(String id);
 }

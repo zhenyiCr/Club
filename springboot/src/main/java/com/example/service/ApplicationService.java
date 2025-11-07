@@ -29,6 +29,7 @@ public class ApplicationService {
         return applicationMapper.selectAll(application);
     }
 
+
     public void add(Application application) {
         // 1. 获取当前登录学生ID
         String studentId = TokenUtils.getCurrentUser().getId();
@@ -66,23 +67,6 @@ public class ApplicationService {
         return PageInfo.of(list);
     }
 
-    // 管理员审核申请
-    public void approve(Application application) {
-        Account currentUser = TokenUtils.getCurrentUser();
-        if (!"ADMIN".equals(currentUser.getRole())) {
-            throw new CustomerException("只有管理员可以审核");
-        }
-        Application dbApp = applicationMapper.selectById(application.getId());
-        if (dbApp == null) {
-            throw new CustomerException("申请不存在");
-        }
-        if (!"PENDING".equals(dbApp.getStatus())) {
-            throw new CustomerException("该申请已处理，无需重复操作");
-        }
-        application.setApproverId(currentUser.getId());
-        application.setApproveTime(DateUtil.now());
-        applicationMapper.updateStatus(application);
-    }
 
 
     public void update(Application application) {
@@ -102,5 +86,26 @@ public class ApplicationService {
         }
     }
 
+    // 审核申请权限校验
+    private void checkApprovePermission(String clubId) {
+        Account currentUser = TokenUtils.getCurrentUser();
+        if ("ADMIN".equals(currentUser.getRole())) {
+            return;
+        }
+        if ("LEADER".equals(currentUser.getRole())) {
+            Club club = clubMapper.selectById(clubId);
+            if (club == null || !club.getFounderId().equals(currentUser.getId())) {
+                throw new CustomerException("无权限审核该社团申请");
+            }
+        } else {
+            throw new CustomerException("权限不足，无法审核申请");
+        }
+    }
+
+    // 审核申请
+    public void approve(Application application) {
+        checkApprovePermission(application.getClubId()); // 校验权限
+        applicationMapper.updateStatus(application);
+    }
 
 }
