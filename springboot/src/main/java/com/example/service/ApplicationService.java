@@ -45,8 +45,8 @@ public class ApplicationService {
             throw new CustomerException("该社团不存在");
         }
         // 3. 新增校验：检查学生是否已加入任何社团
-        List<ClubMember> existingMembers = clubMemberMapper.selectByStudentId(studentId);
-        if (existingMembers != null && !existingMembers.isEmpty()) {
+        ClubMember existingMembers = clubMemberMapper.selectByStudentId(studentId);
+        if (existingMembers != null) {
             throw new CustomerException("一个学生只能加入一个社团，无法提交新申请");
         }
 

@@ -96,12 +96,18 @@ public class ClubService {
     }
 
     public void deleteById(String id) {
+        if (!TokenUtils.getCurrentUser().getRole().equals("ADMIN")) {
+            throw new CustomerException("只有管理员可以删除社团");
+        }
         clubMapper.deleteById(id);
     }
 
 
 
     public void deleteBatch(List<Club> list) {
+        if (!TokenUtils.getCurrentUser().getRole().equals("ADMIN")) {
+            throw new CustomerException("只有管理员可以删除社团");
+        }
         for (Club club : list) {
             this.deleteById(club.getId());
         }

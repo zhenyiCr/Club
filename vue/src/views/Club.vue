@@ -13,16 +13,7 @@
 
             <div style="margin-bottom: 5px;margin-top: 5px">
                 <el-button @click="headleAdd" type="primary">新增</el-button>
-                <el-button @click="deleteBatch" type="danger">批量删除</el-button>
-                <el-button @click="exportDate" type="success">批量导出</el-button>
-                <el-upload
-                        style="display: inline-block;margin-left: 10px"
-                        action="http://localhost:8080/admin/import"
-                        :show-file-list="false"
-                        :on-success="handleImportSuccess"
-                >
-                    <el-button type="primary">导入</el-button>
-                </el-upload>
+                <el-button @click="deleteBatch" type="danger" v-if="data.user.role==='ADMIN'">批量删除</el-button>
 
             </div>
         </div>
@@ -295,23 +286,9 @@ const deleteBatch = () => {
     })
 }
 
-const exportDate = () => {
-    let idsStr = data.ids.join(",") // 把数组转换成 字符串  [1,2,3] -> "1,2,3"
-    let url = `http://localhost:8080//export?username=${data.username === null ? '' : data.username}`
-        + `&name=${data.name === null ? '' : data.name}`
-        + `&ids=${idsStr}`
-        + `&token=${data.user.token}`
-    window.open(url)
-}
 
-const handleImportSuccess = (res) => {
-    if (res.code === '200') {
-        ElMessage.success("导入成功")
-        getData()
-    } else {
-        ElMessage.error(res.msg)
-    }
-}
+
+
 const handleFileSuccess = (res) => {
     data.form.avatar = res.data
 }
