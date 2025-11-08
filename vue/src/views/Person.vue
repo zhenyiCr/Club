@@ -55,16 +55,13 @@
 <script setup>
 import {reactive, onMounted, ref} from "vue";
 import {ElMessage} from "element-plus";
-import request from "../../../../demo/vue/src/utils/request.js";
+import request from "@/utils/request.js";
 const formRef = ref()
 
 const data = reactive({
     user: JSON.parse(localStorage.getItem("user") || "{}"),
     rules: {
-        username: [{required: true, message: "请输入账号", trigger: "blur"}],
         name: [{required: true, message: "请输入名称", trigger: "blur"}],
-        phone: [],
-        email: [{required: true, message: "请输入邮箱", trigger: "blur"}],
     },
 });
 

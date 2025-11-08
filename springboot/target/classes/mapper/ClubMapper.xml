@@ -6,7 +6,8 @@
 
 
     <select id="selectAll" resultType="com.example.entity.Club">
-        select * from `club`
+        select `club`.*, `student`.`name` as `leader_name` from `club`
+        left join `student` on `club`.`leader_id` = `student`.`id`
         <where>
             <if test="name != null and name !='' ">name like '%${name}%'</if>
         </where>
@@ -14,12 +15,12 @@
     </select>
 
     <insert id="insert">
-        insert into `club`(name,description,avatar,founder_id,status)
-        values(#{name},#{description},#{avatar},#{founderId},#{status})
+        insert into `club`(name,description,avatar,leader_id,status)
+        values(#{name},#{description},#{avatar},#{leaderId},#{status})
     </insert>
 
     <update id="update">
-        update `club` set name=#{name},description=#{description},avatar=#{avatar},status=#{status},founder_id=#{founderId} where
+        update `club` set name=#{name},description=#{description},avatar=#{avatar},status=#{status},leader_id=#{leaderId} where
         id=#{id}
     </update>
 

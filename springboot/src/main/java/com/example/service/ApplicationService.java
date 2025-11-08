@@ -103,7 +103,7 @@ public class ApplicationService {
         }
         if ("LEADER".equals(currentUser.getRole())) {
             Club club = clubMapper.selectById(clubId);
-            if (club == null || !club.getFounderId().equals(currentUser.getId())) {
+            if (club == null || !club.getLeaderId().equals(currentUser.getId())) {
                 throw new CustomerException("无权限审核该社团申请");
             }
         } else {
