@@ -22,12 +22,16 @@ public class ClubMemberService {
     @Resource
     private ClubMapper clubMapper;
 
-    // 新增：成员操作权限校验
-    private void checkMemberPermission(String clubId) {
+    // 管理员和社长 操作权限校验
+    private void checkMemberPermission(ClubMember clubMember) {
         Account currentUser = TokenUtils.getCurrentUser();
         if ("ADMIN".equals(currentUser.getRole())) {
             return;
-        } else {
+        }
+        if ("STUDENT".equals(currentUser.getRole()) &&
+                "LEADER".equals(clubMember.getRole()) &&
+                clubMember.getClubId().equals(clubMapper.selectById(currentUser.getId()).getId())
+        ){} else {
             throw new CustomerException("权限不足，无法管理成员");
         }
     }
@@ -40,7 +44,11 @@ public class ClubMemberService {
     // 分页查询社团成员
     public PageInfo<ClubMember> selectPage(Integer pageNum, Integer pageSize, ClubMember clubMember) {
         PageHelper.startPage(pageNum, pageSize);
-        checkMemberPermission(clubMember.getClubId()); // 校验权限
+        Account currentUser = TokenUtils.getCurrentUser();
+        if (!"ADMIN".equals(currentUser.getRole())) {
+            String clubId = clubMemberMapper.selectByStudentId(currentUser.getId()).getClubId();
+            clubMember.setClubId(clubId);
+        }
         List<ClubMember> list = clubMemberMapper.selectAll(clubMember);
         return PageInfo.of(list);
     }
@@ -48,8 +56,8 @@ public class ClubMemberService {
     // 添加社团成员
     public void addMember(ClubMember clubMember) {
         // 新增校验：检查学生是否已加入其他社团
-        List<ClubMember> existingMembers = clubMemberMapper.selectByStudentId(clubMember.getStudentId());
-        if (existingMembers != null && !existingMembers.isEmpty()) {
+        ClubMember existingMembers = clubMemberMapper.selectByStudentId(clubMember.getStudentId());
+        if (existingMembers != null) {
             throw new CustomerException("一个学生只能加入一个社团，无法重复加入");
         }
         clubMember.setJoinTime(new Date().toString());
@@ -58,16 +66,17 @@ public class ClubMemberService {
 
     // 移除社团成员
     public void removeMember(String id) {
-        ClubMember member = clubMemberMapper.selectById(id);
-        checkMemberPermission(member.getClubId()); // 校验权限
+        // 校验权限
+        ClubMember clubMember = clubMemberMapper.selectById(id);
+        checkMemberPermission(clubMember);
         clubMemberMapper.deleteById(id);
     }
 
     // 修改：更新角色前校验权限
     public void updateMemberRole(ClubMember clubMember) {
+        // 校验权限
+        checkMemberPermission(clubMember);
         // 先查询成员所属社团ID
-        ClubMember oldMember = clubMemberMapper.selectById(clubMember.getId());
-        checkMemberPermission(oldMember.getClubId()); // 校验权限
         clubMemberMapper.updateRole(clubMember);
     }
 }

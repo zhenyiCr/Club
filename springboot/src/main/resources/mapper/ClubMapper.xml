@@ -9,7 +9,7 @@
         select `club`.*, `student`.`name` as `leader_name` from `club`
         left join `student` on `club`.`leader_id` = `student`.`id`
         <where>
-            <if test="name != null and name !='' ">name like '%${name}%'</if>
+            <if test="name != null and name !='' ">club.name like '%${name}%'</if>
         </where>
         order by id desc
     </select>

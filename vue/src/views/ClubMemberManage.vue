@@ -40,8 +40,7 @@
                 class="member-table"
                 :header-cell-style="headerCellStyle"
         >
-            <el-table-column prop="id" label="ID" width="80"/>
-            <el-table-column prop="studentId" label="学生ID"/>
+            <el-table-column prop="studentId" label="学生学号"/>
             <el-table-column prop="studentName" label="学生姓名"/>
             <el-table-column prop="clubName" label="社团名称"/>
             <el-table-column prop="role" label="角色">
@@ -59,12 +58,12 @@
                 </template>
             </el-table-column>
             <el-table-column prop="joinTime" label="加入时间"/>
-            <el-table-column label="操作" width="200">
+            <el-table-column label="操作" width="200" v-if="data.user.role !== 'STUDENT'">
                 <template #default="scope">
                     <el-button
                             size="small"
                             @click="handleUpdateRole(scope.row)"
-                            v-if="data.user.role === 'ADMIN' || data.user.role === 'LEADER'"
+                            v-if="data.user.role === 'ADMIN'"
                     >
                         修改角色
                     </el-button>
@@ -72,7 +71,7 @@
                             size="small"
                             type="danger"
                             @click="handleRemoveMember(scope.row.id)"
-                            v-if="data.user.role === 'ADMIN' || data.user.role === 'LEADER'"
+                            v-if="data.user.role === 'ADMIN'"
                     >
                         移除
                     </el-button>

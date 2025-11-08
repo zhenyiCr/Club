@@ -29,5 +29,5 @@ public interface ClubMemberMapper {
     ClubMember selectById(String id);
 
     @Select("select * from club_member where student_id = #{studentId}")
-    List<ClubMember> selectByStudentId(String studentId);
+    ClubMember selectByStudentId(String studentId);
 }
