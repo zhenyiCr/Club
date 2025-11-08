@@ -2,8 +2,10 @@ package com.example.controller;
 
 
 import com.example.common.Result;
+import com.example.entity.Account;
 import com.example.entity.Club;
 import com.example.service.ClubService;
+import com.example.utils.TokenUtils;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +32,10 @@ public class ClubController {
     }
     @DeleteMapping("/delete/{id}")
     public Result delete(@PathVariable String id) { // @PathVariable 接受路径参数
+        Account currentUser = TokenUtils.getCurrentUser();
+        if (!"ADMIN".equals(currentUser.getRole())) {
+            return Result.error("只有管理员可以删除社团");
+        }
         clubService.deleteById(id);
         return Result.success();
     }
