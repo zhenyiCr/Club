@@ -22,11 +22,6 @@ public class ClubController {
     @Resource
     ClubService clubService;
 
-    @GetMapping("/club")
-    public Result club(String title) {
-        String club = clubService.Club(title);
-        return Result.success(club);
-    }
 
     @PostMapping("/add")
     public Result add(@RequestBody Club club) { // @RequestBody 接受前端传来的json数据

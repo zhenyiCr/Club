@@ -9,6 +9,7 @@ import com.example.entity.ClubMember;
 import com.example.exception.CustomerException;
 import com.example.mapper.ApplicationMapper;
 import com.example.mapper.ClubMapper;
+import com.example.mapper.ClubMemberMapper;
 import com.example.utils.TokenUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -25,6 +26,9 @@ public class ApplicationService {
     @Resource
     ClubMapper clubMapper;
 
+    @Resource
+    private ClubMemberMapper clubMemberMapper;
+
     public List<Application> selectAll(Application  application) {
         return applicationMapper.selectAll(application);
     }
@@ -40,8 +44,13 @@ public class ApplicationService {
         if (club == null) {
             throw new CustomerException("该社团不存在");
         }
+        // 3. 新增校验：检查学生是否已加入任何社团
+        List<ClubMember> existingMembers = clubMemberMapper.selectByStudentId(studentId);
+        if (existingMembers != null && !existingMembers.isEmpty()) {
+            throw new CustomerException("一个学生只能加入一个社团，无法提交新申请");
+        }
 
-        // 3. 新增校验：检查该学生是否已申请过该社团（核心逻辑）
+        // 4. 新增校验：检查该学生是否已申请过该社团（核心逻辑）
         Application existing = applicationMapper.selectByStudentAndClub(
                 studentId,
                 application.getClubId()

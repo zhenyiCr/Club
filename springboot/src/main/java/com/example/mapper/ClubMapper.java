@@ -2,6 +2,7 @@ package com.example.mapper;
 
 
 import com.example.entity.Club;
+import com.example.entity.ClubMember;
 import com.example.entity.Notice;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Select;
@@ -25,5 +26,6 @@ public interface ClubMapper {
 
     @Delete("delete from `club` where id = #{id}")
     void deleteById(String id);
+
 
 }
