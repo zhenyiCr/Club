@@ -51,10 +51,10 @@
                 <el-form-item prop="content" label="内容">
                     <el-input type="textarea" rows="4" v-model="data.form.content" autocomplete="off"/>
                 </el-form-item>
-<!--                <el-form-item prop="time" label="发布时间">-->
-<!--                    <el-date-picker v-model="data.form.time" type="datetime" value-format="yyyy-MM-dd HH:mm:ss"-->
-<!--                                    placeholder="选择发布时间"/>-->
-<!--                </el-form-item>-->
+                <!--                <el-form-item prop="time" label="发布时间">-->
+                <!--                    <el-date-picker v-model="data.form.time" type="datetime" value-format="yyyy-MM-dd HH:mm:ss"-->
+                <!--                                    placeholder="选择发布时间"/>-->
+                <!--                </el-form-item>-->
             </el-form>
             <template #footer>
                 <div>
@@ -72,27 +72,23 @@ import request from "@/utils/request.js";
 import {ElMessage, ElMessageBox} from "element-plus";
 
 const data = reactive({
-        user: JSON.parse(localStorage.getItem('user') || '{}'),
-        title: null,
-        pageNum: 1,
-        pageSize: 10,
-        total: 0,
-        tableData: [],
-        formVisible: false,
-        form: {},
-        rules: {
-            title: [
-                {required: true, message: '请输入账号', trigger: 'blur'},
-            ],
-            content: [
-                {required: true, message: '请输入名称', trigger: 'blur'},
-            ],
-            time: [
-                {required: true, message: '请选择发布时间', trigger: 'blur'},
-            ]
-        },
-    }
-)
+    user: JSON.parse(localStorage.getItem('user') || '{}'),
+    title: null,
+    pageNum: 1,
+    pageSize: 10,
+    total: 0,
+    tableData: [],
+    formVisible: false,
+    form: {},
+    rules: {
+        title: [
+            {required: true, message: '请输入标题', trigger: 'blur'},
+        ],
+        content: [
+            {required: true, message: '请输入内容', trigger: 'blur'},
+        ]
+    },
+})
 
 const formRef = ref()
 

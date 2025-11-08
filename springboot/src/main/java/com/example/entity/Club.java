@@ -8,6 +8,10 @@ public class Club {
         private String name;
         private String description;
         private String status;
-        private String founderId;
+        private String leaderId;
         private String avatar;
+
+        // 社团负责人姓名
+        private String leaderName;
+
 }

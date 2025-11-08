@@ -4,12 +4,7 @@
             <div>
                 <el-input clearable @clear="getData"
                           style="margin-right: 10px;width: 260px;margin-bottom: 7px;margin-top: 8px"
-                          placeholder="请输入账户"
-                          :prefix-icon="Search"
-                          v-model="data.username"></el-input>
-                <el-input clearable @clear="getData"
-                          style="margin-right: 10px;width: 260px;margin-bottom: 7px;margin-top: 8px"
-                          placeholder="请输入姓名"
+                          placeholder="请输入名称"
                           :prefix-icon="Search"
                           v-model="data.name"></el-input>
                 <el-button type="primary" @click="getData">查询</el-button>
@@ -52,6 +47,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="name" label="姓名"/>
+                <el-table-column prop="leaderName" label="姓名"/>
                 <el-table-column prop="description" label="内容">
                     <template v-slot="scope">
                         <el-button type="primary" size="mini" @click="viewContent(scope.row.description)">查看</el-button>
@@ -59,8 +55,8 @@
                 </el-table-column>
                 <el-table-column label="操作" width="200">
                     <template #default="scope">
-                        <el-button @click="handleApplication(scope.row)" type="primary" icon="edit"></el-button>
-                        <el-button @click="headleEdit(scope.row)" type="primary" icon="edit" v-if="data.user.role==='ADMIN'"></el-button>
+                        <el-button @click="handleApplication(scope.row)" type="primary"  v-if="data.user.role === 'STUDENT' ">申请</el-button>
+                        <el-button @click="headleEdit(scope.row)" type="primary" icon="edit" v-if="data.user.role==='ADMIN' || data.user.id === scope.row.leaderId "></el-button>
                         <el-button @click="del(scope.row.id)" type="danger" icon="delete" v-if="data.user.role==='ADMIN'"></el-button>
                     </template>
                 </el-table-column>
