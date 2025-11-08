@@ -60,8 +60,8 @@
                 <el-table-column label="操作" width="200">
                     <template #default="scope">
                         <el-button @click="handleApplication(scope.row)" type="primary" icon="edit"></el-button>
-                        <el-button @click="headleEdit(scope.row)" type="primary" icon="edit"></el-button>
-                        <el-button @click="del(scope.row.id)" type="danger" icon="delete"></el-button>
+                        <el-button @click="headleEdit(scope.row)" type="primary" icon="edit" v-if="data.user.role==='ADMIN'"></el-button>
+                        <el-button @click="del(scope.row.id)" type="danger" icon="delete" v-if="data.user.role==='ADMIN'"></el-button>
                     </template>
                 </el-table-column>
             </el-table>

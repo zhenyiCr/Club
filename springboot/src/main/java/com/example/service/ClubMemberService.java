@@ -53,6 +53,11 @@ public class ClubMemberService {
 
     // 添加社团成员
     public void addMember(ClubMember clubMember) {
+        // 新增校验：检查学生是否已加入其他社团
+        List<ClubMember> existingMembers = clubMemberMapper.selectByStudentId(clubMember.getStudentId());
+        if (existingMembers != null && !existingMembers.isEmpty()) {
+            throw new CustomerException("一个学生只能加入一个社团，无法重复加入");
+        }
         clubMember.setJoinTime(new Date().toString());
         clubMemberMapper.insert(clubMember);
     }

@@ -27,4 +27,7 @@ public interface ClubMemberMapper {
     // 根据ID查询社团成员
     @Select("select * from club_member where id = #{id}")
     ClubMember selectById(String id);
+
+    @Select("select * from club_member where student_id = #{studentId}")
+    List<ClubMember> selectByStudentId(String studentId);
 }

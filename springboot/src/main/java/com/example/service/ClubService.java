@@ -20,11 +20,6 @@ public class ClubService {
     @Resource
     ClubMapper clubMapper;
 
-    public String Club(String title) {
-        if (title.equals("club"))
-            return title;
-        else throw new CustomerException("标题不存在");
-    }
 
     // 新增：查询社团时根据角色过滤（LEADER只能看自己的社团）
     public List<Club> selectAll(Club club) {
@@ -32,6 +27,9 @@ public class ClubService {
         // LEADER只能查询自己创建的社团
         if ("LEADER".equals(currentUser.getRole())) {
             club.setFounderId(currentUser.getId());
+        } else if ("MEMBER".equals(currentUser.getRole())) {
+            // MEMBER只能查询已加入的社团
+
         }
         return clubMapper.selectAll(club);
     }
@@ -67,7 +65,6 @@ public class ClubService {
 
 
     public PageInfo<Club> selectPage(Integer pageNum, Integer pageSize, Club club) {
-        checkClubPermission(club.getId());
         // 开始分页查询
         PageHelper.startPage(pageNum, pageSize);
         List<Club> clubs = clubMapper.selectAll(club);
