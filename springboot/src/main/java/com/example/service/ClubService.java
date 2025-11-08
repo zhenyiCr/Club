@@ -96,7 +96,6 @@ public class ClubService {
     }
 
     public void deleteById(String id) {
-        checkClubPermission(id);
         clubMapper.deleteById(id);
     }
 
@@ -107,6 +106,5 @@ public class ClubService {
             this.deleteById(club.getId());
         }
     }
-
 
 }

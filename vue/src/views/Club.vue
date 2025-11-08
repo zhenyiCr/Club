@@ -26,8 +26,6 @@
 
             </div>
         </div>
-
-
         <div>
             <el-table :data="data.tableData" style="width: 100%" @selection-change="handleSelectionChange"
                       :header-cell-style="{fontWeight:'bold',background:'#f5f5f5'}">
@@ -46,8 +44,8 @@
                         <el-avatar v-else icon="User" style="width: 40px; height: 40px; border-radius: 25%"/>
                     </template>
                 </el-table-column>
-                <el-table-column prop="name" label="姓名"/>
-                <el-table-column prop="leaderName" label="姓名"/>
+                <el-table-column prop="name" label="名称"/>
+                <el-table-column prop="leaderName" label="社长姓名"/>
                 <el-table-column prop="description" label="内容">
                     <template v-slot="scope">
                         <el-button type="primary" size="mini" @click="viewContent(scope.row.description)">查看</el-button>
@@ -55,7 +53,6 @@
                 </el-table-column>
                 <el-table-column label="操作" width="200">
                     <template #default="scope">
-                        <el-button @click="handleApplication(scope.row)" type="primary"  v-if="data.user.role === 'STUDENT' ">申请</el-button>
                         <el-button @click="headleEdit(scope.row)" type="primary" icon="edit" v-if="data.user.role==='ADMIN' || data.user.id === scope.row.leaderId "></el-button>
                         <el-button @click="del(scope.row.id)" type="danger" icon="delete" v-if="data.user.role==='ADMIN'"></el-button>
                     </template>
@@ -126,20 +123,6 @@
             <div class="wang-table-view" v-html="data.form.description"></div>
         </el-dialog>
 
-        <el-dialog title="申请信息" v-model="data.applicationVisible" width="40%" destroy-on-close>
-            <el-form ref="formRef" :model="data.applicationForm" :rules="data.rules" label-width="80px"
-                     style="padding:20px 30px 20px 0">
-                <el-form-item prop="reason" label="申请原因">
-                    <el-input type="textarea" rows="4" v-model="data.applicationForm.reason" autocomplete="off"/>
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <div>
-                    <el-button @click="data.applicationVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="submitApplication">提 交</el-button>
-                </div>
-            </template>
-        </el-dialog>
     </div>
 </template>
 
@@ -163,8 +146,6 @@ const data = reactive({
     formVisible: false,
     form: {},
     viewVisible: false,
-    applicationVisible: false,
-    applicationForm:{},
     rules: {
         name: [
             {required: true, message: '请输入名称', trigger: 'blur'},
@@ -339,27 +320,7 @@ const viewContent = (description) => {
     data.viewVisible = true
     data.form.description = description
 }
-const handleApplication = (row) => {
-    data.applicationVisible = true
-    data.applicationForm.studentId = data.user.id
-    data.applicationForm.clubId = row.id
-}
 
-const submitApplication = () => {
-    // formRef 表单的验证
-    formRef.value.validate((valid) => {
-        if (valid) { // 表单验证成功
-            request.post('application/add', data.applicationForm).then(res => {
-                if (res.code === '200') {
-                    ElMessage.success("申请成功")
-                    data.applicationVisible = false
-                } else {
-                    ElMessage.error(res.msg)
-                }
-            })
-        }
-    })
-}
 </script>
 
 <style scoped>

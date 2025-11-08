@@ -27,12 +27,6 @@ public class ClubMemberService {
         Account currentUser = TokenUtils.getCurrentUser();
         if ("ADMIN".equals(currentUser.getRole())) {
             return;
-        }
-        if ("LEADER".equals(currentUser.getRole())) {
-            Club club = clubMapper.selectById(clubId);
-            if (club == null || !club.getLeaderId().equals(currentUser.getId())) {
-                throw new CustomerException("无权限管理该社团成员");
-            }
         } else {
             throw new CustomerException("权限不足，无法管理成员");
         }
