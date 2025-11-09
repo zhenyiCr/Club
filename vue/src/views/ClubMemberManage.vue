@@ -7,7 +7,7 @@
         </div>
 
         <!-- 筛选区域 -->
-        <div class="filter-container">
+        <div class="filter-container" v-if="data.user?.role === 'ADMIN'">
             <el-select
                     v-model="data.selectedClubId"
                     placeholder="请选择社团"
@@ -26,7 +26,6 @@
             <el-button
                     type="primary"
                     @click="showAddMemberDialog"
-                    v-if="data.user.role === 'ADMIN' || data.user.role === 'LEADER'"
             >
                 <el-icon><Plus /></el-icon>
                 添加成员
@@ -58,7 +57,7 @@
                 </template>
             </el-table-column>
             <el-table-column prop="joinTime" label="加入时间"/>
-            <el-table-column label="操作" width="200" v-if="data.user.role !== 'STUDENT'">
+            <el-table-column label="操作" width="200" v-if="data.user.role === 'ADMIN' || data.user.clubRole === 'LEADER'">
                 <template #default="scope">
                     <el-button
                             size="small"
@@ -71,7 +70,7 @@
                             size="small"
                             type="danger"
                             @click="handleRemoveMember(scope.row.id)"
-                            v-if="data.user.role === 'ADMIN'"
+                            v-if="data.user.role === 'ADMIN' || (data.user.clubRole === 'LEADER' && scope.row.studentId !== data.user.id)"
                     >
                         移除
                     </el-button>

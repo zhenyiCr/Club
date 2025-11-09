@@ -21,20 +21,6 @@
             <el-table :data="data.tableData" style="width: 100%" @selection-change="handleSelectionChange"
                       :header-cell-style="{fontWeight:'bold',background:'#f5f5f5'}">
                 <el-table-column type="selection" width="55"/>
-                <el-table-column label="图片" width="120px" size="large">
-                    <template #default="scope">
-                        <el-image
-                            v-if="scope.row.avatar"
-                            :src="scope.row.avatar"
-                            :preview-src-list="[scope.row.avatar]"
-                            :preview-teleported="true"
-                            fit="cover"
-                            style="width: 40px; height: 40px; border-radius: 25%; display: block"
-                        />
-                        <!-- 没有头像时显示默认图标或图片 -->
-                        <el-avatar v-else icon="User" style="width: 40px; height: 40px; border-radius: 25%"/>
-                    </template>
-                </el-table-column>
                 <el-table-column prop="name" label="名称"/>
                 <el-table-column prop="leaderName" label="社长姓名"/>
                 <el-table-column prop="description" label="内容">
@@ -67,21 +53,6 @@
                      style="padding:20px 30px 20px 0">
                 <el-form-item prop="name" label="名称">
                     <el-input v-model="data.form.name" autocomplete="off"/>
-                </el-form-item>
-                <el-form-item prop="avatar" label="社团头像">
-                    <el-upload
-                        action="/api/upload/avatar"
-                        :on-success="handleFileSuccess"
-                        :show-file-list="false"
-                        accept="image/*"
-                    >
-                        <el-button size="small" type="primary">上传头像</el-button>
-                    </el-upload>
-                    <el-image
-                        v-if="data.form.avatar"
-                        :src="data.form.avatar"
-                        style="width: 100px; height: 100px; margin-top: 10px"
-                    />
                 </el-form-item>
                 <el-form-item prop="content" label="内容">
                     <div style="border: 1px solid #ccc; width: 100%">
@@ -284,13 +255,6 @@ const deleteBatch = () => {
             }
         })
     })
-}
-
-
-
-
-const handleFileSuccess = (res) => {
-    data.form.avatar = res.data
 }
 
 const viewContent = (description) => {

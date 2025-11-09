@@ -25,29 +25,37 @@ public class ClubService {
     ClubMemberMapper clubMemberMapper;
 
 
-    // 新增：查询社团时根据角色过滤（LEADER只能看自己的社团）
+    // 新增：查询社团时根据角色过滤
     public List<Club> selectAll(Club club) {
-        Account currentUser = TokenUtils.getCurrentUser();
-        // LEADER只能查询自己创建的社团
-        if ("LEADER".equals(currentUser.getRole())) {
-            club.setLeaderId(currentUser.getId());
-        } else if ("MEMBER".equals(currentUser.getRole())) {
-            // MEMBER只能查询已加入的社团
-//            List<ClubMember> members = clubMemberMapper.selectByClubId(club.getId());
-//            club.setIsJoined(members.stream().anyMatch(member -> member.getId().equals(currentUser.getId())));
-        }
+//        Account currentUser = TokenUtils.getCurrentUser();
+//        // 学生只能查询自己的社团
+//        if ("STUDENT".equals(currentUser.getRole())) {
+//            // 查询当前学生是否属于某个社团（通过社团成员表关联）
+//            ClubMember currentMember = clubMemberMapper.selectByStudentId(currentUser.getId());
+//            // 若不是任何社团的成员，无权限
+//            if (currentMember == null) {
+//                throw new CustomerException("权限不足，仅社团成员可查看自己所在的社团信息");
+//            }
+//            // 限制只能查询自己所在的社团（通过社团ID过滤）
+//            club.setId(currentMember.getClubId()); // 强制查询当前学生所在的社团ID
+//        }
         return clubMapper.selectAll(club);
     }
 
     // 新增：校验社团操作权限（ADMIN无限制，LEADER只能操作自己的社团）
     private void checkClubPermission(String clubId) {
         Account currentUser = TokenUtils.getCurrentUser();
+        // 1. 管理员拥有所有权限
         if ("ADMIN".equals(currentUser.getRole())) {
-            return; // 管理员拥有所有权限
+            return;
         }
-        if ("LEADER".equals(currentUser.getRole())) {
-            Club club = clubMapper.selectById(clubId);
-            if (club == null || !club.getLeaderId().equals(currentUser.getId())) {
+        // 2. 学生角色需要校验是否为该社团的LEADER
+        if ("STUDENT".equals(currentUser.getRole())) {
+            // 查询当前用户在该社团的角色
+            ClubMember currentMember = clubMemberMapper.selectByStudentId(currentUser.getId());
+            if (currentMember == null
+                    || !"LEADER".equals(currentMember.getRole())
+                    || !currentMember.getClubId().equals(clubId)) {
                 throw new CustomerException("无权限操作该社团");
             }
         } else {
@@ -79,12 +87,6 @@ public class ClubService {
     public void update(Club club) {
         checkClubPermission(club.getId());
         // 校验权限（只有创始人可修改）
-        String currentUserId = TokenUtils.getCurrentUser().getId();
-        Club oldClub = clubMapper.selectById(club.getId());
-        if (!oldClub.getLeaderId().equals(currentUserId)) {
-            throw new CustomerException("无权限修改社团信息");
-        }
-
         // 原有名称校验逻辑
         if (!clubMapper.selectName(club).equals(club.getName())) {
             Club dbClub = clubMapper.selectByName(club.getName());

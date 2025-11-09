@@ -3,8 +3,10 @@ package com.example.service;
 import cn.hutool.core.util.StrUtil;
 import com.example.entity.Account;
 import com.example.entity.ChangePasswordDTO;
+import com.example.entity.ClubMember;
 import com.example.entity.Student;
 import com.example.exception.CustomerException;
+import com.example.mapper.ClubMemberMapper;
 import com.example.mapper.StudentMapper;
 import com.example.utils.TokenUtils;
 import com.github.pagehelper.PageHelper;
@@ -19,8 +21,8 @@ public class StudentService {
 
     @Resource
     StudentMapper studentMapper;
-
-
+    @Resource
+    ClubMemberMapper clubMemberMapper;
 
     public List<Student> selectAll(Student student) {
         return studentMapper.selectAll(student);
@@ -80,7 +82,18 @@ public class StudentService {
         if (!dbStudent.getPassword().equals(account.getPassword())) {
             throw new CustomerException("账号或密码错误");
         }
-        String token = TokenUtils.createToken(dbStudent.getId() + "-" +"USER", dbStudent.getPassword());
+
+        // 新增：查询学生的社团信息
+        ClubMember clubMember = clubMemberMapper.selectByStudentId(dbStudent.getId());
+        if (clubMember != null) {
+            dbStudent.setClubId(clubMember.getClubId());
+            dbStudent.setClubRole(clubMember.getRole());
+        } else {
+            dbStudent.setClubId(null);
+            dbStudent.setClubRole(null);
+        }
+
+        String token = TokenUtils.createToken(dbStudent.getId() + "-" +"STUDENT", dbStudent.getPassword());
         dbStudent.setToken(token);
         return dbStudent;
     }

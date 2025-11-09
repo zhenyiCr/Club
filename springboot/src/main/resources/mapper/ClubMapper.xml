@@ -15,12 +15,12 @@
     </select>
 
     <insert id="insert">
-        insert into `club`(name,description,avatar,leader_id,status)
-        values(#{name},#{description},#{avatar},#{leaderId},#{status})
+        insert into `club`(name,description,leader_id,status)
+        values(#{name},#{description},#{leaderId},#{status})
     </insert>
 
     <update id="update">
-        update `club` set name=#{name},description=#{description},avatar=#{avatar},status=#{status},leader_id=#{leaderId} where
+        update `club` set name=#{name},description=#{description},status=#{status},leader_id=#{leaderId} where
         id=#{id}
     </update>
 

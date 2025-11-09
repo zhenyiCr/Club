@@ -4,6 +4,7 @@ package com.example.mapper;
 import com.example.entity.Application;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -15,8 +16,6 @@ public interface ApplicationMapper {
     @Select("select * from `application` where id = #{id}")
     Application selectById(String id);
 
-    void update(Application application);
-
 
 
     @Delete("delete from `application` where id = #{id}")
@@ -26,4 +25,7 @@ public interface ApplicationMapper {
     void updateStatus(Application application);
     @Select("select * from `application` where student_id = #{StudentId} and club_id = #{ClubId}")
     Application selectByStudentAndClub(String StudentId , String ClubId);
+
+
+    void updateById(Application application);
 }

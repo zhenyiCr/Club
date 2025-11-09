@@ -9,18 +9,18 @@
         select `club`.*, `student`.`name` as `leader_name` from `club`
         left join `student` on `club`.`leader_id` = `student`.`id`
         <where>
-            <if test="name != null and name !='' ">name like '%${name}%'</if>
+            <if test="name != null and name !='' ">club.name like '%${name}%'</if>
         </where>
         order by id desc
     </select>
 
     <insert id="insert">
-        insert into `club`(name,description,avatar,leader_id,status)
-        values(#{name},#{description},#{avatar},#{leaderId},#{status})
+        insert into `club`(name,description,leader_id,status)
+        values(#{name},#{description},#{leaderId},#{status})
     </insert>
 
     <update id="update">
-        update `club` set name=#{name},description=#{description},avatar=#{avatar},status=#{status},leader_id=#{leaderId} where
+        update `club` set name=#{name},description=#{description},status=#{status},leader_id=#{leaderId} where
         id=#{id}
     </update>
 
