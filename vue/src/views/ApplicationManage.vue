@@ -128,7 +128,7 @@
                 </el-table-column>
                 <el-table-column prop="createTime" label="申请时间" width="180"/>
                 <!-- 管理员操作列 -->
-                <el-table-column label="操作" width="180" v-if="data.user.role === 'ADMIN'">
+                <el-table-column label="操作" width="180" v-if="data.user.role === 'ADMIN' || data.user.clubRole === 'LEADER'">
                     <template #default="scope">
                         <el-button
                             type="success"
@@ -193,13 +193,15 @@ const formRef = ref()
 
 // 新增：判断是否有审核权限
 const canApprove = (row) => {
+    // 核心：只有“待审核”的申请才允许操作
+    if (row.status !== 'PENDING') return false;
+
     if (data.user.role === 'ADMIN') return true;
-    if (data.user.role === 'LEADER') {
-        // LEADER只能审核自己社团的申请
-        return row.clubId === data.user.clubId && row.status === 'PENDING'
+    if (data.user.role === 'STUDENT' && data.user.clubRole === 'LEADER') {
+        return row.clubId === data.user.clubId;
     }
-    return false
-}
+    return false;
+};
 
 // 表格样式相关计算属性
 const headerCellStyle = computed(() => ({
@@ -225,13 +227,17 @@ const tableRowClassName = ({ row, rowIndex }) => {
 
 // 获取申请列表
 const getData = () => {
-    request.get('/application/selectPage', {
-        params: {
-            pageNum: data.pageNum,
-            pageSize: data.pageSize,
-            status: data.searchStatus
-        }
-    }).then(res => {
+    // 构建查询参数
+    const params = {
+        pageNum: data.pageNum,
+        pageSize: data.pageSize,
+        status: data.searchStatus
+    };
+    // 社长（社团内角色LEADER）需添加社团ID筛选
+    if (data.user.role === 'STUDENT' && data.user.clubRole === 'LEADER') {
+        params.clubId = data.user.clubId; // 假设user对象中存储了所属社团ID
+    }
+    request.get('/application/selectPage', { params }).then(res => {
         if (res.code === '200') {
             data.tableData = res.data.list;
             data.total = res.data.total;

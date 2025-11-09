@@ -27,9 +27,10 @@
         where id = #{id}
     </update>
 
-    <update id="update">
+    <update id="updateById">
         update `application` set student_id=#{studentId},club_id=#{clubId},status=#{status},reason=#{reason},approver_id=#{approverId},approve_time=#{approveTime},remark=#{remark} where
         id=#{id}
     </update>
+
 
 </mapper>

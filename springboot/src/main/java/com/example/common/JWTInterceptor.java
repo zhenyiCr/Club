@@ -45,7 +45,7 @@ public class JWTInterceptor implements HandlerInterceptor {
             // 根据token解析出来的userId 去对应的表查询用户信息
             if ("ADMIN".equals(role)) {
                 account = adminService.selectById(id);
-            } else if ("USER".equals(role)) {
+            } else if ("STUDENT".equals(role)) {
                 account = studentService.selectById(id);
             } else {
                 throw new CustomerException("404", "出现错误");

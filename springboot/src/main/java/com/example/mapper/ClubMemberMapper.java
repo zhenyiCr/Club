@@ -28,6 +28,12 @@ public interface ClubMemberMapper {
     @Select("select * from club_member where id = #{id}")
     ClubMember selectById(String id);
 
-    @Select("select * from club_member where student_id = #{studentId}")
+    @Select("select * from club_member where student_id = #{studentId} limit 1")
     ClubMember selectByStudentId(String studentId);
+
+    @Select("select * from club_member where student_id = #{studentId} and club_id = #{clubId}")
+    ClubMember selectByStudentIdAndClubId(String studentId, String clubId);
+
+    @Select("select * from club_member where student_id = #{studentId} and role = 'LEADER'")
+    ClubMember selectLeaderByStudentId(String studentId);
 }

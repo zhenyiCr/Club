@@ -66,22 +66,35 @@ public class ApplicationService {
 
     // 分页查询申请（管理员/学生视角）
     public PageInfo<Application> selectPage(Integer pageNum, Integer pageSize, Application application) {
-        Account currentUser = TokenUtils.getCurrentUser();
-        // 学生只能看自己的申请，管理员可以看所有
-        if ("STUDENT".equals(currentUser.getRole())) {
-            application.setStudentId(currentUser.getId());
+        Account currentUser = TokenUtils.getCurrentUser(); // 获取当前用户
+        String userRole = currentUser.getRole(); // 全局角色（ADMIN/STUDENT）
+
+        // 1. 管理员（ADMIN）：无限制，可查所有申请
+        if ("ADMIN".equals(userRole)) {
+            // 不额外限制，直接查询
         }
+        // 2. 学生（STUDENT）：区分社长和普通成员
+        else if ("STUDENT".equals(userRole)) {
+            // 2.1 判断当前学生是否为某社团的社长
+            ClubMember leader = clubMemberMapper.selectLeaderByStudentId(currentUser.getId());
+            if (leader != null) {
+                // 社长：仅能查看自己社团的所有申请（用clubId限制）
+                application.setClubId(leader.getClubId());
+            } else {
+                // 普通成员：仅能查看自己提交的申请（用studentId限制）
+                application.setStudentId(currentUser.getId());
+            }
+        }
+        // 3. 其他角色：无权限
+        else {
+            throw new CustomerException("权限不足，无法查看申请");
+        }
+
         PageHelper.startPage(pageNum, pageSize);
         List<Application> list = applicationMapper.selectAll(application);
         return PageInfo.of(list);
     }
 
-
-
-    public void update(Application application) {
-        applicationMapper.update(application);
-
-    }
 
     public void deleteById(String id) {
         applicationMapper.deleteById(id);
@@ -98,23 +111,43 @@ public class ApplicationService {
     // 审核申请权限校验
     private void checkApprovePermission(String clubId) {
         Account currentUser = TokenUtils.getCurrentUser();
+        // 1. 系统管理员：拥有所有权限
         if ("ADMIN".equals(currentUser.getRole())) {
             return;
         }
-        if ("LEADER".equals(currentUser.getRole())) {
-            Club club = clubMapper.selectById(clubId);
-            if (club == null || !club.getLeaderId().equals(currentUser.getId())) {
+        // 2. 学生角色：需校验是否为该社团的社长（LEADER）
+        if ("STUDENT".equals(currentUser.getRole())) {
+            // 查询该学生在申请的社团中是否为社长
+            ClubMember leaderMember = clubMemberMapper.selectByStudentIdAndClubId(
+                    currentUser.getId(), clubId
+            );
+            if (leaderMember == null || !"LEADER".equals(leaderMember.getRole())) {
                 throw new CustomerException("无权限审核该社团申请");
             }
         } else {
+            // 其他角色：无权限
             throw new CustomerException("权限不足，无法审核申请");
         }
     }
 
-    // 审核申请
-    public void approve(Application application) {
-        checkApprovePermission(application.getClubId()); // 校验权限
-        applicationMapper.updateStatus(application);
+
+    // 审核申请（同意/拒绝）
+    public void approveApplication(String applicationId, String status) {
+        // 1. 查询申请详情（获取申请的社团ID）
+        Application application = applicationMapper.selectById(applicationId);
+        if (application == null) {
+            throw new CustomerException("申请不存在");
+        }
+        String clubId = application.getClubId(); // 申请的社团ID
+
+        // 2. 校验审核权限
+        checkApprovePermission(clubId);
+
+        // 3. 执行审核（更新状态）
+        application.setStatus(status);
+        application.setApproverId(TokenUtils.getCurrentUser().getId());
+        application.setApproveTime(DateUtil.now());
+        applicationMapper.updateById(application);
     }
 
 }

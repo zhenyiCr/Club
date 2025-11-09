@@ -33,7 +33,6 @@
                             <el-dropdown-menu>
                                 <el-dropdown-item icon="User" @click="router.push('/manager/person')">个人信息</el-dropdown-item>
                                 <el-dropdown-item icon="Lock" @click="router.push('/manager/upadatePassward')">修改密码</el-dropdown-item>
-                                <el-dropdown-item icon="Setting">系统设置</el-dropdown-item>
                                 <el-dropdown-item @click="Logout" icon="Remove" divided>退出登录</el-dropdown-item>
                             </el-dropdown-menu>
                         </template>
@@ -65,17 +64,15 @@
                         </el-icon>
                         <span>社团信息</span>
                     </el-menu-item>
-                    <el-sub-menu index="system">
+                    <el-sub-menu index="system" v-if="data.user.role === 'ADMIN'">
                         <template #title>
-                            <el-icon>
-                                <Setting/>
-                            </el-icon>
-                            <span>系统设置</span>
+                            <el-icon><User /></el-icon>
+                            <span>角色管理</span>
                         </template>
                         <!-- 管理员信息：仅ADMIN可见 -->
-                        <el-menu-item index="/manager/admin" v-if="data.user?.role === 'ADMIN' ">管理员信息</el-menu-item>
+                        <el-menu-item index="/manager/admin">管理员信息</el-menu-item>
                         <!-- 学生信息：ADMIN和LEADER可见 -->
-                        <el-menu-item index="/manager/student" v-if="data.user?.role === 'ADMIN' || data.user?.role === 'LEADER'">学生信息</el-menu-item>
+                        <el-menu-item index="/manager/student">学生信息</el-menu-item>
                     </el-sub-menu>
 
                     <el-menu-item index="/manager/notice">

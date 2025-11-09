@@ -34,11 +34,7 @@ public class ApplicationController {
         applicationService.deleteBatch(list);
         return Result.success();
     }
-    @PutMapping("/update")
-    public Result update(@RequestBody Application application) {
-        applicationService.update(application);
-        return Result.success();
-    }
+
 
     @GetMapping("/selectAll")
     public Result selectAll(Application application) {
@@ -60,7 +56,7 @@ public class ApplicationController {
     // 审核申请（更新状态）
     @PutMapping("/approve")
     public Result approve(@RequestBody Application application) {
-        applicationService.approve(application);
+        applicationService.approveApplication(application.getId(), application.getStatus());
         return Result.success();
     }
 
